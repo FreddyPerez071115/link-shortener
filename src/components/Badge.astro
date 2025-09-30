@@ -1,0 +1,38 @@
+---
+interface Props {
+  text: string;
+  color: 'green' | 'blue' | 'purple' | 'red' | 'yellow' | 'gray';
+  icon: string; // SVG path
+}
+
+const { text, color, icon } = Astro.props;
+
+// Map de colores para consistencia
+const colorMap = {
+  green: 'text-green-500',
+  blue: 'text-blue-500', 
+  purple: 'text-purple-500',
+  red: 'text-red-500',
+  yellow: 'text-yellow-500',
+  gray: 'text-gray-500'
+};
+---
+
+<div class="flex items-center gap-2 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm px-4 py-2 rounded-full hover:bg-white/80 dark:hover:bg-gray-800/80 transition-colors">
+  <svg 
+    class={`w-5 h-5 ${colorMap[color]}`} 
+    fill="none" 
+    stroke="currentColor" 
+    viewBox="0 0 24 24"
+  >
+    <path 
+      stroke-linecap="round" 
+      stroke-linejoin="round" 
+      stroke-width="2" 
+      d={icon}
+    />
+  </svg>
+  <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+    {text}
+  </span>
+</div>

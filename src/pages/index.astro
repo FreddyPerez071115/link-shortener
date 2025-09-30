@@ -1,11 +1,30 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import Form from '@/components/Form.astro';
+import Hero from '@/components/Hero.astro';
+import Table from '@/components/Table.astro';
+import TableSkeleton from '@/components/TableSkeleton.astro';
+import Layout from '@/layouts/Layout.astro';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+// No necesitamos lógica aquí, el Form maneja todo
 ---
 
-<Layout>
-	<Welcome />
+<Layout title="LinkShort - Acortador de Enlaces">
+  <div
+    class="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-blue-900/20 dark:to-indigo-900/20"
+  >
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <!-- Hero Section Component -->
+      <Hero />
+
+      <!-- Form Section -->
+      <div class="flex justify-center mb-16">
+        <Form />
+      </div>
+
+      <!-- Table Section -->
+      <Table server:defer>
+        <TableSkeleton slot="fallback" rows={3} />
+      </Table>
+    </div>
+  </div>
 </Layout>

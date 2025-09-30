@@ -1,0 +1,97 @@
+---
+interface Props {
+  id: string;
+  name: string;
+  type?: 'text' | 'url';
+  placeholder?: string;
+  required?: boolean;
+  icon: 'link' | 'pencil';
+  error?: string | string[];
+  value?: string;
+}
+
+const {
+  id,
+  name,
+  type = 'text',
+  placeholder,
+  required = false,
+  icon,
+  error,
+  value,
+} = Astro.props;
+
+const icons = {
+  link: `<path
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M13.213 9.787a3.391 3.391 0 0 0-4.795 0l-3.425 3.426a3.39 3.39 0 0 0 4.795 4.794l.321-.304m-.321-4.49a3.39 3.39 0 0 0 4.795 0l3.424-3.426a3.39 3.39 0 0 0-4.794-4.795l-1.028.961"
+        ></path>`,
+  pencil: `<path
+          fill-rule="evenodd"
+          d="M14 4.182A4.136 4.136 0 0 1 16.9 3c1.087 0 2.13.425 2.899 1.182A4.01 4.01 0 0 1 21 7.037c0 1.068-.43 2.092-1.194 2.849L18.5 11.214l-5.8-5.71 1.287-1.31.012-.012Zm-2.717 2.763L6.186 12.13l2.175 2.141 5.063-5.218-2.141-2.108Zm-6.25 6.886-1.98 5.849a.992.992 0 0 0 .245 1.026 1.03 1.03 0 0 0 1.043.242L10.282 19l-5.25-5.168Zm6.954 4.01 5.096-5.186-2.218-2.183-5.063 5.218 2.185 2.15Z"
+          clip-rule="evenodd"></path>`,
+};
+
+const fillType = type === 'url' ? 'none' : 'currentColor';
+
+const errorMessage = error
+  ? Array.isArray(error)
+    ? error.join(', ')
+    : error
+  : null;
+
+const hasError = !!errorMessage;
+
+const inputClasses = hasError
+  ? 'bg-red-50 border border-red-500 text-red-900 placeholder-red-700 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:text-red-500 dark:placeholder-red-500 dark:border-red-500'
+  : 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500';
+
+const iconClasses = hasError
+  ? 'w-6 h-6 text-red-500'
+  : 'w-6 h-6 text-gray-800 dark:text-white';
+---
+
+<div class="space-y-1">
+  <div class="relative">
+    <div
+      class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none"
+    >
+      <svg
+        class={iconClasses}
+        aria-hidden="true"
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        fill={fillType}
+        viewBox="0 0 24 24"
+        set:html={icons[icon]}
+      />
+    </div>
+
+    <input
+      type={type}
+      id={id}
+      name={name}
+      value={value}
+      required={required}
+      pattern={type === 'url' ? 'https?://.*' : undefined}
+      title={type === 'url'
+        ? 'Please enter a valid URL starting with http:// or https://'
+        : undefined}
+      aria-invalid={hasError ? 'true' : 'false'}
+      aria-describedby={hasError ? `${id}-error` : undefined}
+      class={inputClasses}
+      placeholder={placeholder}
+    />
+  </div>
+  {
+    hasError && (
+      <p id={`${id}-error`} class="mt-2 text-sm text-red-600 dark:text-red-500">
+        <span class="font-medium">Error:</span> {errorMessage}
+      </p>
+    )
+  }
+</div>

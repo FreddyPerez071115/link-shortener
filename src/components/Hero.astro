@@ -1,0 +1,37 @@
+---
+// Componente Hero Section para la página principal
+import Badge from '@/components/Badge.astro';
+
+// Definir iconos como constantes para reutilización
+const icons = {
+  check: 'M5 13l4 4L19 7',
+  lightning: 'M13 10V3L4 14h7v7l9-11h-7z',
+  shield:
+    'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z',
+};
+---
+
+<section class="text-center mb-12 px-4">
+  <h1
+    class="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6 leading-tight"
+  >
+    Acorta tus <span
+      class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
+      >Enlaces</span
+    >
+  </h1>
+  <p
+    class="text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed"
+  >
+    Transforma URLs largas en enlaces cortos y fáciles de compartir.
+    <br class="hidden sm:block" />
+    Rápido, seguro y simple.
+  </p>
+
+  <!-- Características destacadas -->
+  <div class="flex flex-wrap justify-center gap-4 mt-8">
+    <Badge text="Gratis" color="green" icon={icons.check} />
+    <Badge text="Rápido" color="blue" icon={icons.lightning} />
+    <Badge text="Seguro" color="purple" icon={icons.shield} />
+  </div>
+</section>
