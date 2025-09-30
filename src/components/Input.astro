@@ -8,6 +8,8 @@ interface Props {
   icon: 'link' | 'pencil';
   error?: string | string[];
   value?: string;
+  maxlength?: number;
+  helpText?: string;
 }
 
 const {
@@ -19,6 +21,8 @@ const {
   icon,
   error,
   value,
+  maxlength,
+  helpText,
 } = Astro.props;
 
 const icons = {
@@ -77,21 +81,31 @@ const iconClasses = hasError
       name={name}
       value={value}
       required={required}
+      maxlength={maxlength}
       pattern={type === 'url' ? 'https?://.*' : undefined}
       title={type === 'url'
         ? 'Please enter a valid URL starting with http:// or https://'
         : undefined}
       aria-invalid={hasError ? 'true' : 'false'}
-      aria-describedby={hasError ? `${id}-error` : undefined}
+      aria-describedby={hasError ? `${id}-error` : helpText ? `${id}-help` : undefined}
       class={inputClasses}
       placeholder={placeholder}
       inputmode={type === 'url' ? 'url' : 'text'}
       autocomplete={type === 'url' ? 'url' : 'off'}
     />
   </div>
+  
+  {
+    helpText && !hasError && (
+      <p id={`${id}-help`} class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+        {helpText}
+      </p>
+    )
+  }
+  
   {
     hasError && (
-      <p id={`${id}-error`} class="mt-2 text-sm text-red-600 dark:text-red-500">
+      <p id={`${id}-error`} class="mt-1 text-sm text-red-600 dark:text-red-500">
         <span class="font-medium">Error:</span> {errorMessage}
       </p>
     )

@@ -25,7 +25,15 @@ export const server = {
           },
           { message: 'URL must start with http:// or https://' }
         ),
-      shortCode: z.string().min(3).max(10).optional(),
+      shortCode: z
+        .string()
+        .min(3, 'Mínimo 3 caracteres')
+        .max(10, 'Máximo 10 caracteres')
+        .regex(
+          /^[a-zA-Z0-9-]+$/,
+          'Solo letras, números y guiones permitidos'
+        )
+        .optional(),
     }),
     handler: async (input) => {
       try {
@@ -58,7 +66,8 @@ export const server = {
         if (existingShortCode.length > 0) {
           throw new ActionError({
             code: 'BAD_REQUEST',
-            message: 'Este código personalizado ya está en uso. Elige uno diferente.',
+            message:
+              'Este código personalizado ya está en uso. Elige uno diferente.',
           });
         }
 
@@ -68,7 +77,8 @@ export const server = {
             originalUrl: input.originalUrl,
             shortCode: finalShortCode,
             isCustom: !!input.shortCode,
-          }).returning();
+          })
+          .returning();
         return newLink;
       } catch (error) {
         if (error instanceof ActionError) {
@@ -90,7 +100,6 @@ export const server = {
             id: links.id,
             originalUrl: links.originalUrl,
             shortCode: links.shortCode,
-            clickCount: links.clickCount,
           })
           .from(links)
           .orderBy(links.createdAt);
