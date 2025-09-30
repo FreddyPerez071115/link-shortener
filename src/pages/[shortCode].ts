@@ -1,12 +1,12 @@
-import type { APIRoute } from 'astro';
 import { db } from '@/db/index';
 import { links } from '@/db/schema';
+import type { APIRoute } from 'astro';
 import { eq } from 'drizzle-orm';
 
 export const GET: APIRoute = async ({ params, redirect }) => {
   try {
     const { shortCode } = params;
-    
+
     if (!shortCode) {
       return new Response('Short code not provided', { status: 400 });
     }
@@ -24,8 +24,8 @@ export const GET: APIRoute = async ({ params, redirect }) => {
     // Incrementar el contador de clicks
     await db
       .update(links)
-      .set({ 
-        clickCount: link.clickCount + 1 
+      .set({
+        clickCount: link.clickCount + 1,
       })
       .where(eq(links.id, link.id));
 

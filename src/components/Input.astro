@@ -85,6 +85,8 @@ const iconClasses = hasError
       aria-describedby={hasError ? `${id}-error` : undefined}
       class={inputClasses}
       placeholder={placeholder}
+      inputmode={type === 'url' ? 'url' : 'text'}
+      autocomplete={type === 'url' ? 'url' : 'off'}
     />
   </div>
   {

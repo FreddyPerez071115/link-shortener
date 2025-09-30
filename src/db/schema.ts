@@ -8,5 +8,5 @@ export const links = sqliteTable('links', {
   createdAt: integer('created_at', { mode: 'timestamp_ms' }).$defaultFn(
     () => new Date()
   ),
-  clickCount: integer('click_count').default(0),
+  clickCount: integer('click_count').default(0).notNull(),
 });
