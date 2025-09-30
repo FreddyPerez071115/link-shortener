@@ -29,10 +29,7 @@ export const server = {
         .string()
         .min(3, 'Mínimo 3 caracteres')
         .max(10, 'Máximo 10 caracteres')
-        .regex(
-          /^[a-zA-Z0-9-]+$/,
-          'Solo letras, números y guiones permitidos'
-        )
+        .regex(/^[a-zA-Z0-9-]+$/, 'Solo letras, números y guiones permitidos')
         .optional(),
     }),
     handler: async (input) => {

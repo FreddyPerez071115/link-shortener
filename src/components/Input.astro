@@ -87,22 +87,29 @@ const iconClasses = hasError
         ? 'Please enter a valid URL starting with http:// or https://'
         : undefined}
       aria-invalid={hasError ? 'true' : 'false'}
-      aria-describedby={hasError ? `${id}-error` : helpText ? `${id}-help` : undefined}
+      aria-describedby={hasError
+        ? `${id}-error`
+        : helpText
+          ? `${id}-help`
+          : undefined}
       class={inputClasses}
       placeholder={placeholder}
       inputmode={type === 'url' ? 'url' : 'text'}
       autocomplete={type === 'url' ? 'url' : 'off'}
     />
   </div>
-  
+
   {
     helpText && !hasError && (
-      <p id={`${id}-help`} class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+      <p
+        id={`${id}-help`}
+        class="mt-1 text-xs text-gray-500 dark:text-gray-400"
+      >
         {helpText}
       </p>
     )
   }
-  
+
   {
     hasError && (
       <p id={`${id}-error`} class="mt-1 text-sm text-red-600 dark:text-red-500">
