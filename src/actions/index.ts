@@ -1,111 +1,82 @@
-import { db } from '@/db/index';
-import { links } from '@/db/schema';
+// Actions Layer: Capa delgada de presentación
+// Responsabilidad: Validación de entrada + mapeo de errores
+
 import { ActionError, defineAction } from 'astro:actions';
 import { z } from 'astro:schema';
-import { eq } from 'drizzle-orm';
-import { nanoid } from 'nanoid';
+import { linkService, LinkServiceError } from '@/services/linkService';
+
+// Schema de validación reutilizable
+const createLinkSchema = z.object({
+  originalUrl: z
+    .string()
+    .url('URL inválida')
+    .refine(
+      (url) => {
+        try {
+          const urlObj = new URL(url);
+          return urlObj.protocol === 'http:' || urlObj.protocol === 'https:';
+        } catch {
+          return false;
+        }
+      },
+      { message: 'La URL debe comenzar con http:// o https://' }
+    ),
+  shortCode: z
+    .string()
+    .min(3, 'Mínimo 3 caracteres')
+    .max(10, 'Máximo 10 caracteres')
+    .regex(
+      /^[a-zA-Z0-9-]+$/,
+      'Solo letras, números y guiones permitidos'
+    )
+    .optional(),
+});
 
 export const server = {
   createLink: defineAction({
     accept: 'form',
-    input: z.object({
-      originalUrl: z
-        .string()
-        .url('Invalid URL')
-        .refine(
-          (url) => {
-            try {
-              const urlObj = new URL(url);
-              return (
-                urlObj.protocol === 'http:' || urlObj.protocol === 'https:'
-              );
-            } catch {
-              return false;
-            }
-          },
-          { message: 'URL must start with http:// or https://' }
-        ),
-      shortCode: z
-        .string()
-        .min(3, 'Mínimo 3 caracteres')
-        .max(10, 'Máximo 10 caracteres')
-        .regex(/^[a-zA-Z0-9-]+$/, 'Solo letras, números y guiones permitidos')
-        .optional(),
-    }),
+    input: createLinkSchema,
     handler: async (input) => {
       try {
-        // 1. Verificar si la URL ya existe (prevenir duplicados)
-        const existingUrl = await db
-          .select()
-          .from(links)
-          .where(eq(links.originalUrl, input.originalUrl));
-
-        if (existingUrl.length > 0) {
-          throw new ActionError({
-            code: 'CONFLICT',
-            message: `Esta URL ya tiene un enlace acortado: /${existingUrl[0].shortCode}`,
-          });
-        }
-
-        // 2. Generar o validar el shortCode
-        let finalShortCode = input.shortCode;
-
-        if (!finalShortCode) {
-          finalShortCode = nanoid(8);
-        }
-
-        // 3. Verificar si el shortCode ya existe
-        const existingShortCode = await db
-          .select()
-          .from(links)
-          .where(eq(links.shortCode, finalShortCode));
-
-        if (existingShortCode.length > 0) {
-          throw new ActionError({
-            code: 'BAD_REQUEST',
-            message:
-              'Este código personalizado ya está en uso. Elige uno diferente.',
-          });
-        }
-
-        const [newLink] = await db
-          .insert(links)
-          .values({
-            originalUrl: input.originalUrl,
-            shortCode: finalShortCode,
-            isCustom: !!input.shortCode,
-          })
-          .returning();
+        // Delegar la lógica al servicio
+        const newLink = await linkService.createLink(input);
         return newLink;
       } catch (error) {
-        if (error instanceof ActionError) {
-          throw error;
+        // Mapear errores del servicio a errores de Astro Actions
+        if (error instanceof LinkServiceError) {
+          throw new ActionError({
+            code: error.code,
+            message: error.message,
+          });
         }
+
+        // Error inesperado
         throw new ActionError({
           code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to create link',
+          message: 'Error al crear el enlace',
         });
       }
     },
   }),
+
   getLinks: defineAction({
     accept: 'json',
     handler: async () => {
       try {
-        const allLinks = await db
-          .select({
-            id: links.id,
-            originalUrl: links.originalUrl,
-            shortCode: links.shortCode,
-          })
-          .from(links)
-          .orderBy(links.createdAt);
-
-        return allLinks;
+        // Delegar al servicio
+        const links = await linkService.getAllLinks();
+        return links;
       } catch (error) {
+        if (error instanceof LinkServiceError) {
+          throw new ActionError({
+            code: error.code,
+            message: error.message,
+          });
+        }
+
         throw new ActionError({
           code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to fetch links',
+          message: 'Error al obtener enlaces',
         });
       }
     },
